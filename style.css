@@ -1,0 +1,22 @@
+:root {
+  /* Cores de Fundo e Texto */
+  --bg-main: #121214; /* Fundo dark mode nativo */
+  --bg-card: #202024;
+  --text-primary: #E1E1E6;
+  --text-secondary: #A8A8B3;
+
+  /* Cores de Marca e Ação */
+  --brand-primary: #8257E5; /* Roxo tech */
+  --brand-primary-hover: #996DFF;
+  
+  /* Conversão (Carrinho/Comprar) */
+  --action-buy: #04D361; /* Verde vibrante para o botão de compra */
+  --action-buy-hover: #04BF58;
+
+  /* Feedback */
+  --status-success: #04D361;
+  --status-error: #F75A68;
+
+  /* Bordas e Divisores */
+  --border-light: #323238;
+}
