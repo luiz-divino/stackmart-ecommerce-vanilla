@@ -6,30 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
         content="ApexMarket - O seu e-commerce completo com os melhores produtos tecnológicos e lifestyle do mercado.">
-    <title>ApexMarket | Início</title>
+    <title>Shopsmart | Início</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
-
     <header class="main-header">
         <div class="header-container">
-            <div class="logo-area">
-                <span class="logo-icon" aria-hidden="true"><img src="image/logo.webp" alt="logo do site"></span>
-            </div>
+
+            <a href="index.html" class="logo-area">
+                <div class="logo-area">
+                    <img class="logo-icon" src="image/logo.webp" alt="Logo da Loja">
+                </div>
+            </a>
+
             <nav class="main-nav" aria-label="Navegação Principal">
-                <ul>
+                <ul id="primary-navigation" class="nav-list">
                     <li><a href="index.html" class="nav-link active">Início</a></li>
                     <li><a href="gallery.html" class="nav-link">Produtos</a></li>
-                    <li>
-                        <a href="cart.html" class="nav-link cart-link" aria-label="Acessar Carrinho de Compras">
-                            <i class="fa-solid fa-cart-shopping cart-icon" aria-hidden="true"></i>
-                            <span id="cart-counter" class="cart-badge"></span>
-                        </a>
-                    </li>
                 </ul>
             </nav>
+
+            <div class="header-actions">
+                <a href="cart.html" class="nav-link cart-link" aria-label="Acessar Carrinho de Compras">
+                    <i class="fa-solid fa-cart-shopping cart-icon" aria-hidden="true"></i>
+                    <span id="cart-counter" class="cart-badge">0</span>
+                </a>
+
+                <button id="mobile-menu-btn" class="menu-toggle" aria-controls="primary-navigation"
+                    aria-expanded="false" aria-label="Abrir menu de navegação">
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                </button>
+            </div>
+
         </div>
     </header>
 
@@ -40,7 +50,7 @@
                 class="hero-image" loading="eager">
             <div class="hero-content">
                 <h2 class="hero-title">O Futuro das suas Compras Está Aqui</h2>
-                <p class="hero-subtitle">Explore uma curadoria exclusiva de produtos globais com entrega rápida e
+                <p class="hero-subtitle">Explore um catalógo exclusivo de produtos globais com entrega rápida e
                     segurança garantida.</p>
                 <a href="gallery.html" class="btn btn-cta">Explorar Produtos</a>
             </div>
@@ -49,7 +59,7 @@
 
     <footer class="main-footer">
         <div class="footer-container">
-            <p class="footer-copy">&copy; 2026 ApexMarket. Todos os direitos reservados.</p>
+            <p class="footer-copy">&copy; 2026 shopsmart. Todos os direitos reservados.</p>
             <nav class="social-nav" aria-label="Redes Sociais">
                 <ul>
                     <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
@@ -62,7 +72,7 @@
             </nav>
         </div>
     </footer>
-
+    <script src="js/script.js"></script>
 </body>
 
 </html>
