@@ -1,85 +1,303 @@
-// responsavel por toda a logica da api
-const API = (function () {
-    const BASE_URL = "https://dummyjson.com/products";
+/* ==================================================== STATE & CONFIGURATION ==================================================== */
+const API_URL = "https://dummyjson.com/products?limit=0";
+let allProducts = [];
+let cart = JSON.parse(localStorage.getItem("apex_cart")) || [];
 
-    // função auxiliar para tratar respostas com erro
-    async function handleResponse(response) {
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Erro ${response.status}: ${errorText}`);
-        }
-        return response.json();
+/* ==================================================== INITIALIZATION CONTROLLER ==================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+    updateCartCounter();
+    // Roteamento interno simples baseado nos elementos presentes na árvore DOM
+    if (document.getElementById("products-grid")) {
+        initGalleryPage();
+    }
+    if (document.getElementById("cart-items-container")) {
+        initCartPage();
+    }
+});
+
+/* ==================================================== STORAGE MANAGERS ==================================================== */
+function saveCartToStorage() {
+    localStorage.setItem("apex_cart", JSON.stringify(cart));
+}
+
+/* ==================================================== GALLERY LOGIC ==================================================== */
+async function initGalleryPage() {
+    const grid = document.getElementById("products-grid");
+    const spinner = document.getElementById("loading-spinner");
+
+    spinner.style.display = "flex";
+    grid.style.display = "none";
+
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        allProducts = data.products;
+
+        renderCategories(allProducts);
+        renderGallery(allProducts);
+        setupSearchAndFilters();
+    } catch (error) {
+        console.error("Erro ao consumir a API DummyJSON:", error);
+        grid.innerHTML = `<p class="error-msg">Falha ao carregar catálogo. Tente novamente mais tarde.</p>`;
+    } finally {
+        spinner.style.display = "none";
+        grid.style.display = "grid";
+    }
+}
+
+function renderGallery(products) {
+    const grid = document.getElementById("products-grid");
+    grid.innerHTML = "";
+
+    if (products.length === 0) {
+        grid.innerHTML = `<p class="no-results">Nenhum produto correspondente encontrado.</p>`;
+        return;
     }
 
-    // Essa funcao busca todos os produtos com limite e skip opcionais
-    async function fetchAllProducts(limit = 30, skip = 0) {
-        try {
-            const url = `${BASE_URL}?limit=${limit}&skip=${skip}`;
-            const response = await fetch(url);
-            const data = await handleResponse(response);
-        } catch (error) {
-            console.error("Erro ao buscar produtos:", error);
-            throw error;
-        }
-    }
+    products.forEach((product) => {
+        const cardPerspective = document.createElement("div");
+        cardPerspective.classList.add("card-perspective");
 
-    // Essa funcao busca um unico produto pelo id
-    async function fetchProductById(id) {
-        try {
-            const response = await fetch(`${BASE_URL}/${id}`);
-            const data = await handleResponse(response);
-            return data;
-        } catch (error) {
-            console.error(`Erro ao buscar produto ${id}:`, error);
-            throw error;
-        }
-    }
+        // Construção da estrutura estruturada e semântica com Article
+        cardPerspective.innerHTML = `
+            <article class="product-card" id="card-${product.id}">
+                <div class="card-front">
+                    <div class="img-wrapper">
+                        <img src="${product.images[0]}" alt="${product.title}" loading="lazy">
+                    </div>
+                    <h3 class="product-title">${product.title}</h3>
+                    <span class="product-price">$${product.price.toFixed(2)}</span>
+                    <p class="product-desc">${product.description}</p>
+                    <div class="meta-info">
+                        <p>🚚 ${product.shippingInformation || "Standard shipping"}</p>
+                        <p>📦 Status: ${product.availabilityStatus || "Em estoque"}</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-add-cart" onclick="addToCart(${product.id})">Adicionar</button>
+                        <button class="btn-flip" onclick="toggleFlip(${product.id})" aria-label="Ver avaliações">🔄</button>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <div class="back-header">
+                        <h4>Avaliações do Produto</h4>
+                        <button class="btn-flip" onclick="toggleFlip(${product.id})" aria-label="Voltar à frente">🔄</button>
+                    </div>
+                    <div class="reviews-container">
+                        ${renderReviews(product.reviews)}
+                    </div>
+                </div>
+            </article>
+        `;
+        grid.appendChild(cardPerspective);
+    });
+}
 
-    // Essa funcao busca produtos por categoria
-    async function fetchProductsByCategory(category, limit = 30) {
-        try {
-            const url = `${BASE_URL}/category/${category}?limit=${limit}`;
-            const response = await fetch(url);
-            const data = await handleResponse(response);
-            return data.products;
-        } catch (error) {
-            console.error(`Erro ao buscar categoria ${category}:`, error);
-            throw error;
-        }
-    }
+function renderReviews(reviews) {
+    if (!reviews || reviews.length === 0)
+        return `<p class="no-reviews">Sem avaliações disponíveis.</p>`;
+    return reviews
+        .map(
+            (rev) => `
+        <div class="review-subcard">
+            <div class="review-meta">
+                <span>${rev.reviewerName}</span>
+                <span class="review-rating">${"★".repeat(rev.rating)}${"☆".repeat(5 - rev.rating)}</span>
+            </div>
+            <p class="review-text">"${rev.comment}"</p>
+        </div>
+    `,
+        )
+        .join("");
+}
 
-    // Buscar produtos com termo de busca (search)
-    async function searchProducts(query, limit = 30) {
-        try {
-            const url = `${BASE_URL}/search?q=${encodeURIComponent(query)}&limit=${limit}`;
-            const response = await fetch(url);
-            const data = await handleResponse(response);
-            return data.products;
-        } catch (error) {
-            console.error(`Erro ao buscar por "${query}":`, error);
-            throw error;
-        }
-    }
+function renderCategories(products) {
+    const container = document.getElementById("categories-filter");
+    // Extrai categorias unicamente mapeadas da lista principal
+    const categories = ["Todos", ...new Set(products.map((p) => p.category))];
 
-    // Obter todas as categorias disponíveis
-    async function fetchCategories() {
-        try {
-            const response = await fetch(`${BASE_URL}/categories`);
-            const data = await handleResponse(response);
-            return data; // array de strings com nomes das categorias
-        } catch (error) {
-            console.error("Erro ao buscar categorias:", error);
-            throw error;
-        }
-    }
+    container.innerHTML = categories
+        .map(
+            (cat) => `
+        <button class="btn-category ${cat === "Todos" ? "active" : ""}" data-category="${cat}">
+            ${cat.charAt(0).toUpperCase() + cat.slice(1)}
+        </button>
+    `,
+        )
+        .join("");
+}
 
-    // Retorna o objeto público com as funções
-    return {
-        fetchAllProducts,
-        fetchProductById,
-        fetchProductsByCategory,
-        fetchCategories,
+function setupSearchAndFilters() {
+    const searchInput = document.getElementById("search-input");
+    const categoryContainer = document.getElementById("categories-filter");
+    let currentCategory = "Todos";
+
+    const filterAction = () => {
+        const query = searchInput.value.toLowerCase().trim();
+        const filtered = allProducts.filter((p) => {
+            const matchesCategory =
+                currentCategory === "Todos" || p.category === currentCategory;
+            const matchesSearch =
+                p.title.toLowerCase().includes(query) ||
+                p.description.toLowerCase().includes(query);
+            return matchesCategory && matchesSearch;
+        });
+        renderGallery(filtered);
     };
-})();
 
+    searchInput.addEventListener("input", filterAction);
 
+    categoryContainer.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("btn-category")) return;
+
+        document
+            .querySelectorAll(".btn-category")
+            .forEach((b) => b.classList.remove("active"));
+        e.target.classList.add("active");
+
+        currentCategory = e.target.getAttribute("data-category");
+        filterAction();
+    });
+}
+
+function toggleFlip(id) {
+    const card = document.getElementById(`card-${id}`);
+    if (card) card.classList.toggle("is-flipped");
+}
+
+function addToCart(id) {
+    // Busca o produto no array carregado da API
+    const product = allProducts.find((p) => p.id === id);
+    if (!product) return;
+
+    const existing = cart.find((item) => item.id === id);
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cart.push({
+            id: product.id,
+            title: product.title,
+            price: product.price,
+            thumbnail: product.thumbnail, // Requisito: Exibir thumbnail na pág de carrinho
+            quantity: 1,
+        });
+    }
+    saveCartToStorage();
+    updateCartCounter();
+    alert(`${product.title} foi adicionado ao seu carrinho!`);
+}
+
+/* ==================================================== CART LOGIC ==================================================== */
+function initCartPage() {
+    renderCart();
+    setupModal();
+}
+
+function renderCart() {
+    const container = document.getElementById("cart-items-container");
+    container.innerHTML = "";
+
+    if (cart.length === 0) {
+        container.innerHTML = `<p class="empty-cart-msg">Seu carrinho está vazio. Visite a galeria de produtos para iniciar suas adições!</p>`;
+        updateCartTotal(0);
+        return;
+    }
+
+    cart.forEach((item) => {
+        const itemCard = document.createElement("article");
+        itemCard.classList.add("cart-item-card");
+        itemCard.innerHTML = `
+            <img src="${item.thumbnail}" alt="${item.title}" class="cart-item-thumb" loading="lazy">
+            <div class="cart-item-details">
+                <h3 class="cart-item-name">${item.title}</h3>
+                <p class="cart-item-price">$${item.price.toFixed(2)}</p>
+            </div>
+            <div class="cart-qty-controls">
+                <button class="btn-qty" onclick="changeQuantity(${item.id}, -1)" aria-label="Remover uma unidade">-</button>
+                <span class="qty-display">${item.quantity}</span>
+                <button class="btn-qty" onclick="changeQuantity(${item.id}, 1)" aria-label="Adicionar uma unidade">+</button>
+            </div>
+        `;
+        container.appendChild(itemCard);
+    });
+
+    const calculatedTotal = cart.reduce(
+        (acc, curr) => acc + curr.price * curr.quantity,
+        0,
+    );
+    updateCartTotal(calculatedTotal);
+}
+
+function changeQuantity(id, delta) {
+    const item = cart.find((i) => i.id === id);
+    if (!item) return;
+
+    item.quantity += delta;
+    if (item.quantity <= 0) {
+        cart = cart.filter((i) => i.id !== id);
+    }
+    saveCartToStorage();
+    updateCartCounter();
+    renderCart();
+}
+
+function updateCartTotal(total) {
+    document.getElementById("cart-total-value").textContent =
+        `$${total.toFixed(2)}`;
+}
+
+function setupModal() {
+    const btnCheckout = document.getElementById("btn-checkout");
+    const modal = document.getElementById("checkout-modal");
+    const closeModal = document.getElementById("close-modal");
+    const modalMsg = document.getElementById("modal-message-text");
+
+    btnCheckout.addEventListener("click", () => {
+        if (cart.length === 0) {
+            alert(
+                "Adicione itens ao carrinho antes de prosseguir com a finalização.",
+            );
+            return;
+        }
+
+        const total = cart.reduce(
+            (acc, curr) => acc + curr.price * curr.quantity,
+            0,
+        );
+
+        // Mensagem Customizada para o Usuário
+        modalMsg.innerHTML = `Sua compra no valor total de <strong>$${total.toFixed(2)}</strong> está sendo processada com segurança pelo nosso sistema de pagamentos.`;
+
+        // Ativação do estado do Modal
+        modal.classList.add("is-active");
+        modal.setAttribute("aria-hidden", "false");
+
+        // Limpa o estado local pós fechamento simulado de compra
+        cart = [];
+        saveCartToStorage();
+        renderCart();
+        updateCartCounter();
+    });
+
+    const hideModal = () => {
+        modal.classList.remove("is-active");
+        modal.setAttribute("aria-hidden", "true");
+    };
+
+    closeModal.addEventListener("click", hideModal);
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) hideModal();
+    });
+}
+
+/* ==================================================== CART COUNTER LOGIC ==================================================== */
+function updateCartCounter() {
+    const counterElement = document.getElementById("cart-counter");
+    if (!counterElement) return;
+
+    // Calcula a quantidade total de itens (somando as quantidades individuais)
+    const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+    counterElement.textContent = totalItems;
+
+    // Opcional visual: esconde o contador se o carrinho estiver zerado
+    counterElement.style.display = totalItems > 0 ? "flex" : "none";
+}
