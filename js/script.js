@@ -1,12 +1,13 @@
-/* ==================================================== STATE & CONFIGURATION ==================================================== */
+/* ==================================================== CONFIG BASE URL E LOCAL STORAGE ==================================================== */
 const API_URL = "https://dummyjson.com/products?limit=0";
 let allProducts = [];
 let cart = JSON.parse(localStorage.getItem("apex_cart")) || [];
 
-/* ==================================================== INITIALIZATION CONTROLLER ==================================================== */
+/* ==================================================== ADD LISTENER AO CARREGAR O DOM ==================================================== */
 document.addEventListener("DOMContentLoaded", () => {
+    initMobileMenu();
     updateCartCounter();
-    // Roteamento interno simples baseado nos elementos presentes na árvore DOM
+
     if (document.getElementById("products-grid")) {
         initGalleryPage();
     }
@@ -15,12 +16,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-/* ==================================================== STORAGE MANAGERS ==================================================== */
+/* ==================================================== SALVANDO O ESTADO ATUAL NO LOCAL STORAGE ==================================================== */
 function saveCartToStorage() {
     localStorage.setItem("apex_cart", JSON.stringify(cart));
 }
 
-/* ==================================================== GALLERY LOGIC ==================================================== */
+/* ==================================================== LOGICA DA GALERIA DE PRODUTOS ==================================================== */
 async function initGalleryPage() {
     const grid = document.getElementById("products-grid");
     const spinner = document.getElementById("loading-spinner");
@@ -69,16 +70,16 @@ function renderGallery(products) {
                     <span class="product-price">$${product.price.toFixed(2)}</span>
                     <p class="product-desc">${product.description}</p>
 
-<div class="meta-info">
-    <p><i class="fa-solid fa-truck"></i> ${product.shippingInformation || "Standard shipping"}</p>
-    <p><i class="fa-solid fa-box"></i> Status: ${product.availabilityStatus || "Em estoque"}</p>
-</div>
-<div class="card-actions">
-    <button class="btn btn-add-cart" onclick="addToCart(${product.id})">Adicionar</button>
-    <button class="btn-flip" onclick="toggleFlip(${product.id})" aria-label="Ver avaliações">
-        <i class="fa-solid fa-rotate"></i>
-    </button>
-</div>
+                      <div class="meta-info">
+                          <p><i class="fa-solid fa-truck"></i> ${product.shippingInformation || "Standard shipping"}</p>
+                          <p><i class="fa-solid fa-box"></i> Status: ${product.availabilityStatus || "Em estoque"}</p>
+                      </div>
+                    <div class="card-actions">
+                        <button class="btn btn-add-cart" onclick="addToCart(${product.id})">Adicionar</button>
+                        <button class="btn-flip" onclick="toggleFlip(${product.id})" aria-label="Ver avaliações">
+                            <i class="fa-solid fa-rotate"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="card-back">
                     <div class="back-header">
@@ -101,7 +102,6 @@ function renderReviews(reviews) {
 
     return reviews
         .map((rev) => {
-            // Gera as estrelas preenchidas e vazias dinamicamente
             const solidStars = `<i class="fa-solid fa-star"></i>`.repeat(
                 rev.rating,
             );
@@ -139,7 +139,6 @@ function renderReviews(reviews) {
 
 function renderCategories(products) {
     const container = document.getElementById("categories-filter");
-    // Extrai categorias unicamente mapeadas da lista principal
     const categories = ["Todos", ...new Set(products.map((p) => p.category))];
 
     container.innerHTML = categories
@@ -192,7 +191,6 @@ function toggleFlip(id) {
 }
 
 function addToCart(id) {
-    // Busca o produto no array carregado da API
     const product = allProducts.find((p) => p.id === id);
     if (!product) return;
 
@@ -213,7 +211,7 @@ function addToCart(id) {
     alert(`${product.title} foi adicionado ao seu carrinho!`);
 }
 
-/* ==================================================== CART LOGIC ==================================================== */
+/* ==================================================== LOGICA DO CART DE COMPRAS (ADD E ENVIAR PARA A PAGINA DE CART) ==================================================== */
 function initCartPage() {
     renderCart();
     setupModal();
@@ -291,14 +289,11 @@ function setupModal() {
             0,
         );
 
-        // Mensagem Customizada para o Usuário
         modalMsg.innerHTML = `Sua compra no valor total de <strong>$${total.toFixed(2)}</strong> está sendo processada com segurança pelo nosso sistema de pagamentos.`;
 
-        // Ativação do estado do Modal
         modal.classList.add("is-active");
         modal.setAttribute("aria-hidden", "false");
 
-        // Limpa o estado local pós fechamento simulado de compra
         cart = [];
         saveCartToStorage();
         renderCart();
@@ -316,7 +311,7 @@ function setupModal() {
     });
 }
 
-/* ==================================================== CART COUNTER LOGIC ==================================================== */
+/* ==================================================== CONTADOR LOGICO AO ADICIONAR UM ITEM AO CART ==================================================== */
 function updateCartCounter() {
     const counterElement = document.getElementById("cart-counter");
     if (!counterElement) return;
@@ -327,4 +322,35 @@ function updateCartCounter() {
 
     // Opcional visual: esconde o contador se o carrinho estiver zerado
     counterElement.style.display = totalItems > 0 ? "flex" : "none";
+}
+
+/* ==================================================== LOGICA DE MENU MOBILE ==================================================== */
+function initMobileMenu() {
+    const menuBtn = document.getElementById("mobile-menu-btn");
+    const navList = document.getElementById("primary-navigation");
+
+    // Proteção: caso os elementos não existam na página
+    if (!menuBtn || !navList) return;
+
+    const icon = menuBtn.querySelector("i");
+
+    menuBtn.addEventListener("click", () => {
+        // Verifica o estado atual de acessibilidade
+        const isExpanded = menuBtn.getAttribute("aria-expanded") === "true";
+
+        // Alterna o atributo aria-expanded para Leitores de Tela
+        menuBtn.setAttribute("aria-expanded", !isExpanded);
+
+        // Alterna a classe visual da lista no CSS
+        navList.classList.toggle("is-active");
+
+        // Alterna o Ícone do Font Awesome (De Menu para Fechar e vice-versa)
+        if (!isExpanded) {
+            icon.classList.remove("fa-bars");
+            icon.classList.add("fa-xmark");
+        } else {
+            icon.classList.remove("fa-xmark");
+            icon.classList.add("fa-bars");
+        }
+    });
 }
