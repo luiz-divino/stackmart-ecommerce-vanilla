@@ -68,19 +68,22 @@ function renderGallery(products) {
                     <h3 class="product-title">${product.title}</h3>
                     <span class="product-price">$${product.price.toFixed(2)}</span>
                     <p class="product-desc">${product.description}</p>
-                    <div class="meta-info">
-                        <p>🚚 ${product.shippingInformation || "Standard shipping"}</p>
-                        <p>📦 Status: ${product.availabilityStatus || "Em estoque"}</p>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn btn-add-cart" onclick="addToCart(${product.id})">Adicionar</button>
-                        <button class="btn-flip" onclick="toggleFlip(${product.id})" aria-label="Ver avaliações">🔄</button>
-                    </div>
+
+<div class="meta-info">
+    <p><i class="fa-solid fa-truck"></i> ${product.shippingInformation || "Standard shipping"}</p>
+    <p><i class="fa-solid fa-box"></i> Status: ${product.availabilityStatus || "Em estoque"}</p>
+</div>
+<div class="card-actions">
+    <button class="btn btn-add-cart" onclick="addToCart(${product.id})">Adicionar</button>
+    <button class="btn-flip" onclick="toggleFlip(${product.id})" aria-label="Ver avaliações">
+        <i class="fa-solid fa-rotate"></i>
+    </button>
+</div>
                 </div>
                 <div class="card-back">
                     <div class="back-header">
                         <h4>Avaliações do Produto</h4>
-                        <button class="btn-flip" onclick="toggleFlip(${product.id})" aria-label="Voltar à frente">🔄</button>
+                        <button class="btn-flip" onclick="toggleFlip(${product.id})" aria-label="Voltar à frente"><i class="fa-solid fa-rotate"></i></button>
                     </div>
                     <div class="reviews-container">
                         ${renderReviews(product.reviews)}
@@ -93,6 +96,30 @@ function renderGallery(products) {
 }
 
 function renderReviews(reviews) {
+    if (!reviews || reviews.length === 0)
+        return `<p class="no-reviews">Sem avaliações disponíveis.</p>`;
+
+    return reviews
+        .map((rev) => {
+            // Gera as estrelas preenchidas e vazias dinamicamente
+            const solidStars = `<i class="fa-solid fa-star"></i>`.repeat(
+                rev.rating,
+            );
+            const regularStars = `<i class="fa-regular fa-star"></i>`.repeat(
+                5 - rev.rating,
+            );
+
+            return `
+          <div class="review-subcard">
+              <div class="review-meta">
+                  <span>${rev.reviewerName}</span>
+                  <span class="review-rating">${solidStars}${regularStars}</span>
+              </div>
+              <p class="review-text">"${rev.comment}"</p>
+          </div>
+      `;
+        })
+        .join("");
     if (!reviews || reviews.length === 0)
         return `<p class="no-reviews">Sem avaliações disponíveis.</p>`;
     return reviews
