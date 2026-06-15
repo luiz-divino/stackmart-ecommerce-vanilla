@@ -3,41 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="image/logo.webp" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
-    <title>Stackmart e-commerce</title>
+    <meta name="description" content="Gerencie seus itens adicionados ao carrinho na ApexMarket e finalize sua compra com segurança.">
+    <title>ApexMarket | Carrinho de Compras</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
     <header class="main-header">
         <div class="header-container">
-            <a href="index.html" class="logo" aria-label="Página inicial">
-                <img src="image/logo.webp" alt="Logotipo Meu Site" class="logo-img">
-            </a>
-            <nav class="main-nav" aria-label="Menu principal">
-                <button class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
-                <ul class="nav-list">
+            <div class="logo-area">
+                <span class="logo-icon" aria-hidden="true"><img src="image/logo.webp" alt="logo do site"></span>
+            </div>
+            <nav class="main-nav" aria-label="Navegação Principal">
+                <ul>
                     <li><a href="index.html" class="nav-link">Início</a></li>
                     <li><a href="gallery.html" class="nav-link">Produtos</a></li>
-                    <li><a href="cart.html" class="nav-link">Carrinho</a></li>
-                </ul>
+                    <li>
+                      <a href="cart.html" class="nav-link cart-link" aria-label="Acessar Carrinho de Compras">
+                          <span class="cart-icon" aria-hidden="true">🛒</span>
+                          <span id="cart-counter" class="cart-badge">0</span>
+                      </a>
+                  </li>                </ul>
             </nav>
         </div>
     </header>
 
-    <main>
-        <!-- conteúdo específico de cada página -->
+    <main class="cart-page-container">
+        <h2 class="page-title">Seu Carrinho de Compras</h2>
+        
+        <div class="cart-layout">
+            <section class="cart-items-section" id="cart-items-container" aria-label="Itens no carrinho">
+                </section>
+
+            <section class="cart-summary-section" id="cart-summary" aria-label="Resumo do pedido">
+                <div class="summary-box">
+                    <h3>Resumo do Pedido</h3>
+                    <div class="summary-row">
+                        <span>Total estimado:</span>
+                        <span id="cart-total-value" class="total-price">$0.00</span>
+                    </div>
+                    <button id="btn-checkout" class="btn btn-checkout">Finalizar Compra</button>
+                </div>
+            </section>
+        </div>
     </main>
 
-    <footer class="footer">
+    <div id="checkout-modal" class="modal-overlay" aria-hidden="true" role="dialog">
+        <div class="modal-content">
+            <button id="close-modal" class="modal-close-btn" aria-label="Fechar Modal">&times;</button>
+            <div class="modal-icon">🎉</div>
+            <h3 class="modal-title">Pedido Processado!</h3>
+            <p id="modal-message-text" class="modal-text"></p>
+            <div class="modal-badge">
+                <p>💡 Importante: Compras acima de <strong>$500.00</strong> garantem Frete Grátis Global!</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
         <div class="footer-container">
-            <p class="footer-copy">&copy; 2026 - Projeto Front-end</p>
-            <ul class="social-links">
-                <li><a href="#" class="social-link">Instagram</a></li>
-                <li><a href="#" class="social-link">Facebook</a></li>
-                <li><a href="#" class="social-link">Twitter</a></li>
-            </ul>
+            <p class="footer-copy">&copy; 2026 ApexMarket. Todos os direitos reservados.</p>
+            <nav class="social-nav" aria-label="Redes Sociais">
+                <ul>
+                    <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-link">Instagram</a></li>
+                    <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-link">LinkedIn</a></li>
+                    <li><a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-link">Twitter</a></li>
+                </ul>
+            </nav>
         </div>
     </footer>
-    <script src="script.js"></script>
+
+    <script src="js/script.js"></script>
 </body>
 </html>
