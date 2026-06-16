@@ -99,8 +99,8 @@ Embora o projeto entregue todos os requisitos funcionais previstos, ele está se
 
 Desenvolvido por Luiz Fernando Divino, um estudante de Engenharia de Software no **IBMEC-RJ**. Este projeto faz parte do meu portfólio acadêmico e profissional, demonstrando minha evolução técnica e atenção aos detalhes que formam uma ótima experiência web.
 
-- **LinkedIn:** [Seu LinkedIn Aqui](https://www.linkedin.com/in/luizsdivino)
-- **GitHub:** [Seu GitHub Aqui](https://github.com/luiz-divino)
+- **LinkedIn:** [Aqui](https://www.linkedin.com/in/luizsdivino)
+- **GitHub:** [Aqui](https://github.com/luiz-divino)
 
 ## 📄 Licença
 
