@@ -15,7 +15,7 @@ A aplicação consome os dados em tempo real a partir da API pública do [DummyJ
 
 ## 🚀 Demonstração
 
- Deploy da aplicação no github pages: https://luiz-divino.github.io/shopsmart-ecommerce-vanilla/
+ Deploy da aplicação no github pages: [Shopsmart](https://luiz-divino.github.io/shopsmart-ecommerce-vanilla/)
 
  O projeto está disponível para execução local. As instruções para rodar o projeto em sua máquina encontram-se na seção [Como Executar](#-como-executar-o-projeto).
 
