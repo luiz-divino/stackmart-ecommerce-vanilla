@@ -60,7 +60,7 @@ Este projeto foi construído priorizando diretrizes de código limpo e padrões 
 
 1. Clone este repositório para a sua máquina:
    ```bash
-   git clone <link-do-repositorio>
+   git clone <https://github.com/luiz-divino/shopsmart-ecommerce-vanilla.git>
    ```
 2. Navegue até a pasta do projeto:
    ```bash
